@@ -24,7 +24,7 @@ describe('AuthController', () => {
 
   it('should register a user', async () => {
     const result = { id: 1, username: 'testuser', email: 'test@test.com', password: 'password' };
-    jest.spyOn(authService, 'register').mockImplementation(async () => result);
+    jest.spyOn(authService, 'register').mockResolvedValue(result);
 
     expect(
       await authController.register('testuser', 'test@test.com', 'password'),
@@ -33,8 +33,14 @@ describe('AuthController', () => {
 
   it('should login a user', async () => {
     const token = 'test-token';
-    jest.spyOn(authService, 'login').mockImplementation(async () => ({ access_token: token }));
+    const user = { username: 'testuser', id: 1, email: 'test@test.com', password: 'password' };
 
-    expect(await authController.login('test@test.com', 'password')).toEqual({ access_token: token });
+    // Mock the validateUser method to return a user
+    jest.spyOn(authService, 'validateUser').mockResolvedValue(user);
+    jest.spyOn(authService, 'login').mockResolvedValue({ access_token: token });
+
+    expect(await authController.login('test@test.com', 'password')).toEqual({
+      access_token: token,
+    });
   });
 });
