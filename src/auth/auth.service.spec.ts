@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 describe('AuthService', () => {
   let authService: AuthService;
   let jwtService: JwtService;
+  let prismaService: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -15,6 +16,7 @@ describe('AuthService', () => {
 
     authService = module.get<AuthService>(AuthService);
     jwtService = module.get<JwtService>(JwtService);
+    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {
@@ -30,11 +32,14 @@ describe('AuthService', () => {
 
   it('should return a JWT token', async () => {
     const token = 'test-token';
-    jest.spyOn(jwtService, 'sign').mockImplementation(() => token);
+    const user = { id: 1, username: 'testuser', email: 'test@test.com', password: 'password' };
+
+    // Mock the validateUser method to return a user
+    jest.spyOn(authService, 'validateUser').mockResolvedValue(user);
+    jest.spyOn(jwtService, 'sign').mockReturnValue(token);
 
     expect(await authService.login('test@test.com', 'password')).toEqual({
       access_token: token,
     });
   });
-
 });
