@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -9,7 +11,7 @@ describe('AuthController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [AuthService],
+      providers: [AuthService, PrismaService, JwtService],
     }).compile();
 
     authController = module.get<AuthController>(AuthController);
@@ -21,7 +23,7 @@ describe('AuthController', () => {
   });
 
   it('should register a user', async () => {
-    const result = { username: 'testuser', email: 'test@test.com' };
+    const result = { id: 1, username: 'testuser', email: 'test@test.com', password: 'password' };
     jest.spyOn(authService, 'register').mockImplementation(async () => result);
 
     expect(
