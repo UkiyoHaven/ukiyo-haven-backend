@@ -32,8 +32,9 @@ describe('AuthService', () => {
     const token = 'test-token';
     jest.spyOn(jwtService, 'sign').mockImplementation(() => token);
 
-    expect(authService.login({ username: 'testuser', id: 1 })).toEqual({
+    expect(await authService.login('test@test.com', 'password')).toEqual({
       access_token: token,
     });
   });
+
 });
