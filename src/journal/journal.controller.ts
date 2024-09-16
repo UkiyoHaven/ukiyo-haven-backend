@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Req, UseGuards } from '@nestjs/common';
+// src/journal/journal.controller.ts
+import { Controller, Get, Post, Patch, Delete, Body, Param, Req, UseGuards } from '@nestjs/common';
 import { JournalService } from './journal.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -18,5 +19,19 @@ export class JournalController {
   async getUserEntries(@Req() req) {
     const userId = req.user.id;
     return this.journalService.getUserEntries(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async updateEntry(@Param('id') id: string, @Body('entry') entry: string, @Req() req) {
+    const userId = req.user.id;
+    return this.journalService.updateJournalEntry(userId, parseInt(id), entry);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async deleteEntry(@Param('id') id: string, @Req() req) {
+    const userId = req.user.id;
+    return this.journalService.deleteJournalEntry(userId, parseInt(id));
   }
 }
