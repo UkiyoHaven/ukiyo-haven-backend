@@ -6,10 +6,10 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JournalController } from './journal/journal.controller';
 import { JournalService } from './journal/journal.service';
 import { ConfigModule } from '@nestjs/config';
-
+import { DiscussionsGateway } from './discussions/discussions.gateway';
 @Module({
   imports: [AuthModule, PrismaModule, ConfigModule.forRoot()],
   controllers: [AppController, JournalController],
-  providers: [AppService, JournalService],
+  providers: [AppService, JournalService, DiscussionsGateway],
 })
 export class AppModule {}
