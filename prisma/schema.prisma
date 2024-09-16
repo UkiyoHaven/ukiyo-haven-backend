@@ -22,3 +22,10 @@ model Journal {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
 }
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  user      String
+  content   String
+  createdAt DateTime @default(now())
+}
