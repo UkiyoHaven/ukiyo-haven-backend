@@ -6,10 +6,11 @@ export class JournalService {
   constructor(private prisma: PrismaService) {}
 
   async createJournalEntry(userId: number, entry: string) {
+    console.log('Creating journal entry for user:', userId);  // Add log for debugging
     return this.prisma.journal.create({
       data: {
-        userId,
         entry,
+        userId,  // Associate journal entry with the correct user
       },
     });
   }
@@ -17,6 +18,7 @@ export class JournalService {
   async getUserEntries(userId: number) {
     return this.prisma.journal.findMany({
       where: { userId },
+      orderBy: { createdAt: 'desc' },  // Return entries sorted by date
     });
   }
 }

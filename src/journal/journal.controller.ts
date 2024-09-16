@@ -9,12 +9,14 @@ export class JournalController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async createEntry(@Body('entry') entry: string, @Req() req) {
-    return this.journalService.createJournalEntry(req.user.userId, entry);
+    const userId = req.user.id;
+    return this.journalService.createJournalEntry(userId, entry);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
   async getUserEntries(@Req() req) {
-    return this.journalService.getUserEntries(req.user.userId);
+    const userId = req.user.id;
+    return this.journalService.getUserEntries(userId);
   }
 }
