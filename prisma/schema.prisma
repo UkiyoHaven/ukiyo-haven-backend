@@ -13,6 +13,7 @@ model User {
   password String
   username String
   journals Journal[]
+  goals    Goal[]
 }
 
 model Journal {
@@ -28,4 +29,15 @@ model Message {
   user      String
   content   String
   createdAt DateTime @default(now())
+}
+
+model Goal {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  deadline    DateTime?
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
 }
