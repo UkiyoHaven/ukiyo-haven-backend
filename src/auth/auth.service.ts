@@ -8,6 +8,7 @@ export class AuthService {
   constructor(private jwtService: JwtService, private prisma: PrismaService) {}
 
   async register(username: string, email: string, password: string) {
+    console.log('Received registration request:', { username, email });
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.prisma.user.create({
       data: {
@@ -16,6 +17,7 @@ export class AuthService {
         password: hashedPassword,
       },
     });
+    console.log('User created:', user);
     return user;
   }
 
