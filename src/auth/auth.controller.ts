@@ -11,6 +11,7 @@ export class AuthController {
     @Body('email') email: string,
     @Body('password') password: string,
   ) {
+    console.log('Received registration request:', { username, email });
     return this.authService.register(username, email, password);
   }
 
