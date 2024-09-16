@@ -1,39 +1,44 @@
-import {
-    WebSocketGateway,
-    WebSocketServer,
-    SubscribeMessage,
-    MessageBody,
-    ConnectedSocket,
-    OnGatewayInit,
-    OnGatewayConnection,
-    OnGatewayDisconnect,
-  } from '@nestjs/websockets';
-  import { Server, Socket } from 'socket.io';
+// src/discussion/discussion.gateway.ts
+import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGatewayConnection, ConnectedSocket } from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+import { PrismaService } from '../prisma/prisma.service';
 
-  @WebSocketGateway({
-    cors: {
-      origin: '*',  // Allow connections from any origin (you may want to restrict this)
-    },
-  })
-  export class DiscussionsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-    @WebSocketServer() server: Server;
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
+export class DiscussionsGateway implements OnGatewayConnection {
+  @WebSocketServer() server: Server;
 
-    afterInit(server: Server) {
-      console.log('Socket.IO server initialized');
-    }
+  constructor(private prisma: PrismaService) {}
 
-    handleConnection(client: Socket) {
-      console.log(`Client connected: ${client.id}`);
-    }
+  // Handle when a client connects
+  async handleConnection(client: Socket) {
+    console.log(`Client connected: ${client.id}`);
 
-    handleDisconnect(client: Socket) {
-      console.log(`Client disconnected: ${client.id}`);
-    }
+    // Load previous messages from the database
+    const previousMessages = await this.prisma.message.findMany({
+      orderBy: { createdAt: 'asc' },
+    });
 
-    @SubscribeMessage('sendMessage')
-    handleSendMessage(@MessageBody() data: { user: string, message: string }, @ConnectedSocket() client: Socket) {
-      console.log('Message received:', data);
-      // Broadcast the message to all connected clients
-      this.server.emit('receiveMessage', data);
-    }
+    // Send previous messages to the newly connected client
+    client.emit('loadPreviousMessages', previousMessages);
   }
+
+  @SubscribeMessage('sendMessage')
+  async handleSendMessage(@MessageBody() data: { user: string, message: string }, @ConnectedSocket() client: Socket) {
+    console.log('Message received:', data);
+
+    // Save message to the database
+    const savedMessage = await this.prisma.message.create({
+      data: {
+        user: data.user,
+        content: data.message,
+      },
+    });
+
+    // Broadcast the message to all clients
+    this.server.emit('receiveMessage', savedMessage);
+  }
+}
