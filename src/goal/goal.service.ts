@@ -6,7 +6,7 @@ export class GoalService {
   constructor(private prisma: PrismaService) {}
 
   async createGoal(userId: number, title: string, description?: string, deadline?: Date) {
-    return this.prisma.goal.create({
+    const newGoal = await this.prisma.goal.create({
       data: {
         title,
         description,
@@ -14,6 +14,8 @@ export class GoalService {
         userId,
       },
     });
+    console.log(`Created Goal with ID: ${newGoal.id}`);
+    return newGoal;
   }
 
   async getUserGoals(userId: number) {
