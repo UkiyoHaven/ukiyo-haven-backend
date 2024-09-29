@@ -1,4 +1,11 @@
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGatewayConnection, ConnectedSocket } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
+  OnGatewayConnection,
+  ConnectedSocket,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -32,7 +39,10 @@ export class DiscussionsGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('sendMessage')
-  async handleSendMessage(@MessageBody() data: { user: string, message: string }, @ConnectedSocket() client: Socket) {
+  async handleSendMessage(
+    @MessageBody() data: { user: string; message: string },
+    @ConnectedSocket() client: Socket,
+  ) {
     console.log('Message received:', data);
 
     try {
